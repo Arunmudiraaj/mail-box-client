@@ -30,15 +30,14 @@ const Login = () => {
     }
     try{
         const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC0iwu5MM1xgit0Z4u6vflCChaBIUJup6M', user)
-        const updated = response.data.email.replace('@','')
-        const updatedMailReq = updated.replace('.','')
+        
         // localStorage.setItem('email', updatedMailReq)
         // localStorage.setItem('loginId', response.data.idToken)
         dispatch(authActions.login({
             token : response.data.idToken,
-            email : updatedMailReq
+            email : response.data.email
         }))
-        console.log(updatedMailReq)
+        
         console.log(response.data.idToken)
         navigate('/user')
 

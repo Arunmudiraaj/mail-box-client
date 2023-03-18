@@ -1,3 +1,4 @@
+import './app.css'
 import Home from './pages/Home';
 import Navigation from './Components/Navigation';
 import { Route, Routes } from 'react-router-dom';
