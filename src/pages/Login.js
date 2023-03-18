@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import { authActions } from '../Store/auth';
 import { useDispatch } from 'react-redux';
-
+import { useNavigate } from 'react-router-dom';
 import { Card } from 'react-bootstrap'
 import { InputGroup } from 'react-bootstrap'
 import Button from 'react-bootstrap/Button'
@@ -11,6 +11,7 @@ import { useRef } from 'react'
 import axios from 'axios'
 
 const Login = () => {
+    const navigate = useNavigate()
     const emailRef = useRef();
   const passwordRef = useRef();
   const dispatch = useDispatch()
@@ -37,9 +38,9 @@ const Login = () => {
             token : response.data.idToken,
             email : updatedMailReq
         }))
-        console.log(response.data.email)
+        console.log(updatedMailReq)
         console.log(response.data.idToken)
-        // navigate('/user')
+        navigate('/user')
 
     }
     catch(error){
