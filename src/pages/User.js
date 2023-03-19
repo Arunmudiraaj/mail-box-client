@@ -9,10 +9,24 @@ import { useDispatch } from 'react-redux';
 import { mailsActions } from '../Store/mails';
 import JoditEditor from 'jodit-react';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 const User = () => {
+
+
+  const [compose, setCompose] = useState(false)
+  
+  const toggleCompose = ()=>{
+    setCompose(pre=>!pre)
+  }
+
+  useEffect(()=>{loadInbox()},[])
   const dispatch = useDispatch()
   const email = useSelector(state=> state.authentication.email)
+  // const inbox = useSelector(state=> state.mails.inbox)
+  const [inbox,setInbox] = useState({})
+
   const toMailId = useRef()
   
 
@@ -20,12 +34,27 @@ const User = () => {
   //   buttons : ['bold','italic']
   // }
   const editorRef = useRef()
+
+
+  const loadInbox = async()=>{
+    const mailEndPoint = email.replace('@','').replace('.','')
+    const inboxResponse = await axios.get(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${mailEndPoint}/inbox.json`)
+    const sentResponse = await axios.get(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${mailEndPoint}/sent.json`)
+    console.log(inboxResponse.data)
+    console.log(sentResponse.data)
+    setInbox(inboxResponse.data)
+
+    dispatch(mailsActions.initializeMails({
+      sent : sentResponse.data
+    }))
+  }
+
   const editorChangeHandler = (textHtml)=>{
    
     console.log(editorRef.current.value)
-    console.log(textHtml)
+  
   }
-  const sendMailHandler = ()=>{
+  const sendMailHandler = async()=>{
     const to = toMailId.current.value
     const body = editorRef.current.value
 
@@ -64,8 +93,9 @@ const User = () => {
   return (
     <div>
       <div style={{'fontSize': '2rem'}} className='m-2 p-2 px-5 font-monospace'>Welcome To Mail Box</div>
+      <div onClick={toggleCompose} className='text-center'> {compose? <Button variant='danger'>Close</Button> :<Button>Compose Mail</Button>} </div>
 
-    <Container className='col-lg-8 h-75 mx-auto my-3 bg-opacity-10 bg-black p-3'>
+    {compose && <Container className='col-lg-8 h-75 mx-auto my-3 bg-opacity-10 bg-black p-3'>
       <Row>
         <Col>
         <InputGroup className="mb-1">
@@ -83,6 +113,37 @@ const User = () => {
         </Col>
       </Row>
       {/* <div dangerouslySetInnerHTML={{ __html: editorText }} /> */}
+    </Container>}
+
+    <Container className='col-lg-8 h-75 mx-auto my-3 bg-opacity-10 bg-black p-3 px-4'>
+      <Row>
+        <Col className='text-center'>
+          <span style={{'fontSize': '2rem'}} className='text-center mx-1'>Your Inbox </span> 
+          {Object.keys(inbox).length>0 && <span className='text-success my-auto'>{`(${Object.keys(inbox).length} mails)`}</span>}
+          
+        </Col>
+      </Row>
+
+      <Row>
+        
+      {inbox.length===0 && <div className='text-center mt-4 text-danger'>--Your Inbox is Empty--</div>}
+      </Row>
+
+      {/* {inbox.map(item=>
+        <Row className='border border-1 p-2 border-dark my-1'>
+        <div>From :  <strong>{item.from}</strong></div>
+        <div className='mt-2 ms-2'>{item.body}</div>
+      </Row>
+        )} */}
+        {
+          Object.keys(inbox).map(key=>
+            <Row key={key} className='border border-1 p-2 border-dark my-1'>
+        <div>From :  <strong>{inbox[key].from}</strong></div>
+        <div className='mt-2 ms-2'>{inbox[key].body}</div>
+      </Row>
+            )
+        }
+        
     </Container>
 
     </div>

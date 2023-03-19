@@ -3,7 +3,6 @@ import { createSlice } from "@reduxjs/toolkit";
 const mailsSlice = createSlice({
     name: 'mails',
     initialState : {
-        inbox: {},
         sent : {}
     },
     reducers: {
@@ -14,6 +13,7 @@ const mailsSlice = createSlice({
         },
         initializeMails(state,action){
             state = action.payload
+            console.log(`initialized state with ${action.payload}`)
         }
     }
     
