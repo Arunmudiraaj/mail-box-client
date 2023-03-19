@@ -11,6 +11,7 @@ import JoditEditor from 'jodit-react';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const User = () => {
 
@@ -24,8 +25,8 @@ const User = () => {
   useEffect(()=>{loadInbox()},[])
   const dispatch = useDispatch()
   const email = useSelector(state=> state.authentication.email)
-  // const inbox = useSelector(state=> state.mails.inbox)
-  const [inbox,setInbox] = useState({})
+  const inbox = useSelector(state=> state.mails.inbox)
+
 
   const toMailId = useRef()
   
@@ -42,14 +43,27 @@ const User = () => {
     const sentResponse = await axios.get(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${mailEndPoint}/sent.json`)
     console.log(inboxResponse.data)
     console.log(sentResponse.data)
-    setInbox(inboxResponse.data)
 
-    dispatch(mailsActions.initializeMails({
-      sent : sentResponse.data
-    }))
+    // dispatch(mailsActions.initializeMails({
+    //   sent : sentResponse.data,
+    //   inbox : inboxResponse.data
+    // }))
+    if (inboxResponse.data){
+      dispatch(mailsActions.initializeInbox(inboxResponse.data))
+    }
+    else{
+      dispatch(mailsActions.initializeInbox({}))
+    }
+    if (sentResponse.data){
+      dispatch(mailsActions.initializeSent(sentResponse.data))
+    }
+    else{
+      dispatch(mailsActions.initializeSent({}))
+    }
+  
   }
 
-  const editorChangeHandler = (textHtml)=>{
+  const editorChangeHandler = ()=>{
    
     console.log(editorRef.current.value)
   
@@ -60,7 +74,8 @@ const User = () => {
 
     const composedMail = {
       from : email,
-      body : body
+      body : body,
+      read : false
     }
     const toMail = to.replace('@','').replace('.','')
     
@@ -71,18 +86,20 @@ const User = () => {
     }
     catch(err){
       console.log(err)
-      alert("Something went wrong")
+      alert("Something went wrong while sending message")
       return
     }
     try{
       const fromMailId = email.replace('@','').replace('.','')
-      axios.post(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${fromMailId}/sent.json`,{to : to, body : body})
-      dispatch(mailsActions.mailSent({to : to, body : body}))
+      const res = await axios.post(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${fromMailId}/sent.json`,{to : to, body : body})
+      console.log(res)
+      dispatch(mailsActions.mailSent({id : res.data.name, mail :{to : to, body : body}}))
       console.log(composedMail)
     }
     catch(err){
       console.log(err)
       alert("something went wrong")
+      return
     }
     
 
@@ -90,6 +107,18 @@ const User = () => {
     console.log(`${email} is sending the mail ${editorRef.current.value} to the person ${toMailId.current.value}`)
    
   }
+
+  
+  const calculateUnRead = ()=>{
+    let val = 0
+    Object.keys(inbox).forEach(key =>{
+      if (inbox[key].read===false){
+        val++
+      }
+    })
+    return val
+  }
+  const unread = calculateUnRead()
   return (
     <div>
       <div style={{'fontSize': '2rem'}} className='m-2 p-2 px-5 font-monospace'>Welcome To Mail Box</div>
@@ -119,14 +148,14 @@ const User = () => {
       <Row>
         <Col className='text-center'>
           <span style={{'fontSize': '2rem'}} className='text-center mx-1'>Your Inbox </span> 
-          {Object.keys(inbox).length>0 && <span className='text-success my-auto'>{`(${Object.keys(inbox).length} mails)`}</span>}
+          {<span className='text-success my-auto'>{`(${unread} unread)`}</span>}
           
         </Col>
       </Row>
 
       <Row>
         
-      {inbox.length===0 && <div className='text-center mt-4 text-danger'>--Your Inbox is Empty--</div>}
+      {Object.keys(inbox).length===0 && <div className='text-center mt-4 text-danger'>--Your Inbox is Empty--</div>}
       </Row>
 
       {/* {inbox.map(item=>
@@ -136,11 +165,17 @@ const User = () => {
       </Row>
         )} */}
         {
-          Object.keys(inbox).map(key=>
+         Object.keys(inbox).map(key=>
+            <Link key={key} to={`/inbox/${key}`} style={{'textDecoration': 'none', 'color': 'black'}}>
             <Row key={key} className='border border-1 p-2 border-dark my-1'>
-        <div>From :  <strong>{inbox[key].from}</strong></div>
-        <div className='mt-2 ms-2'>{inbox[key].body}</div>
+              
+              <Col className='col-12'>
+              <div>{!inbox[key].read && <span>🔵</span>} From :  <strong>{inbox[key].from}</strong></div>
+              <div className='mt-2 ms-2'><div dangerouslySetInnerHTML={{ __html: inbox[key].body }} /></div>
+              </Col>
+        
       </Row>
+      </Link>
             )
         }
         

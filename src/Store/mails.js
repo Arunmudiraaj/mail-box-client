@@ -3,17 +3,26 @@ import { createSlice } from "@reduxjs/toolkit";
 const mailsSlice = createSlice({
     name: 'mails',
     initialState : {
+        inbox : {},
         sent : {}
     },
     reducers: {
         mailSent(state,action){
-            state.sent.push(action.payload)
+            state.sent[action.payload.id] = action.payload.mail
             console.log(action.payload, 'got pushed')
 
         },
-        initializeMails(state,action){
-            state = action.payload
-            console.log(`initialized state with ${action.payload}`)
+        mailRead(state,action){
+            state.inbox[action.payload.id] = {...action.payload.mail, read : true}
+            console.log(action.payload, 'read')
+
+        },
+        initializeInbox(state,action){
+            state.inbox = action.payload
+
+        },
+        initializeSent(state, action){
+            state.sent = action.payload
         }
     }
     
