@@ -27,7 +27,7 @@ const User = () => {
     setCompose(pre=>!pre)
   }
 
-  useEffect(()=>{loadInbox()},[])
+  useEffect(()=>{getData()},[])
   const dispatch = useDispatch()
   const email = useSelector(state=> state.authentication.email)
   const inbox = useSelector(state=> state.mails.inbox)
@@ -42,7 +42,7 @@ const User = () => {
   const editorRef = useRef()
 
 
-  const loadInbox = async()=>{
+  const getData = async()=>{
     const mailEndPoint = email.replace('@','').replace('.','')
     const inboxResponse = await axios.get(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${mailEndPoint}/inbox.json`)
     const sentResponse = await axios.get(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${mailEndPoint}/sent.json`)
@@ -138,6 +138,11 @@ const User = () => {
         alert("Something went wrong")
     }
   }
+
+
+  setInterval(()=>{
+    getData()
+  },2000)
   return (
     <div>
       <div style={{'fontSize': '2rem'}} className='m-2 p-2 px-5 font-monospace'>Welcome To Mail Box</div>
