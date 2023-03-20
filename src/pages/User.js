@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import {AiFillDelete} from 'react-icons/ai'
 
 const User = () => {
 
@@ -119,6 +120,20 @@ const User = () => {
     return val
   }
   const unread = calculateUnRead()
+
+  const deleteMail = async(id)=>{
+    console.log(id)
+    dispatch(mailsActions.deleteFromInbox(id))
+    try{
+      const emailEndPoint = email.replace('@','').replace('.','')
+      const res = await axios.delete(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${emailEndPoint}/inbox/${id}.json`)
+      console.log(res)
+    }
+    catch(err){
+        console.log(err)
+        alert("Something went wrong")
+    }
+  }
   return (
     <div>
       <div style={{'fontSize': '2rem'}} className='m-2 p-2 px-5 font-monospace'>Welcome To Mail Box</div>
@@ -166,16 +181,16 @@ const User = () => {
         )} */}
         {
          Object.keys(inbox).map(key=>
-            <Link key={key} to={`/inbox/${key}`} style={{'textDecoration': 'none', 'color': 'black'}}>
             <Row key={key} className='border border-1 p-2 border-dark my-1'>
-              
-              <Col className='col-12'>
-              <div>{!inbox[key].read && <span>🔵</span>} From :  <strong>{inbox[key].from}</strong></div>
-              <div className='mt-2 ms-2'><div dangerouslySetInnerHTML={{ __html: inbox[key].body }} /></div>
+              <Col className='col-11'>
+                  <Link key={key} to={`/inbox/${key}`} style={{'textDecoration': 'none', 'color': 'black'}}>
+                  <div>{!inbox[key].read && <span>🔵</span>} From :  <strong>{inbox[key].from}</strong></div>
+                  <div className='mt-2 ms-2'><div dangerouslySetInnerHTML={{ __html: inbox[key].body }} /></div>
+                  </Link>
               </Col>
-        
-      </Row>
-      </Link>
+              <Col className='m-auto'><AiFillDelete style={{'cursor': 'pointer'}} onClick={()=>{deleteMail(key)}}/></Col>
+            </Row>
+          
             )
         }
         
