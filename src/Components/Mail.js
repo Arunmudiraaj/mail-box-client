@@ -10,14 +10,15 @@ const Mail = () => {
     const dispatch = useDispatch()
     const myParams = useParams()
     const id = myParams.mailId
+    const folder = myParams.folder
     const [mail, setMail] = useState({from : '...', body: '...'})
     
     const mailRead = async()=>{
       const emailEndPoint = email.replace('@','').replace('.','')
-      const res = await  axios.get(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${emailEndPoint}/inbox/${id}.json`)
+      const res = await  axios.get(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${emailEndPoint}/${folder}/${id}.json`)
       setMail(res.data)
       dispatch(mailsActions.mailRead({id : id, mail : res.data}))
-      const readRes = await  axios.put(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${emailEndPoint}/inbox/${id}.json`, {...res.data, read : true})
+      const readRes = await  axios.put(`https://mail-box-client-4b607-default-rtdb.firebaseio.com/${emailEndPoint}/${folder}/${id}.json`, {...res.data, read : true})
 
      
     }
@@ -26,7 +27,7 @@ const Mail = () => {
     useEffect(()=>{mailRead()},[])
   return (
     <Container className='col-lg-8 h-75 mx-auto my-3 bg-opacity-10 bg-black p-3 px-4'>
-        <h3>Mail From {mail.from}</h3>
+        <h3>Mail {folder==='inbox'?`From ${mail.from}`:`To ${mail.to}`} </h3>
         <br/>
         <div dangerouslySetInnerHTML={{ __html: mail.body }} />
     </Container>

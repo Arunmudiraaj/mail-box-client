@@ -16,7 +16,7 @@ function App() {
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='user' element={<User/>}/>
-        <Route path='/inbox/:mailId' element={<Mail/>}/>
+        <Route path='/:folder/:mailId' element={<Mail/>}/>
 
       </Routes>
     </div>

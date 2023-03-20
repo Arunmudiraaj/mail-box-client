@@ -13,11 +13,15 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {AiFillDelete} from 'react-icons/ai'
+import Sent from '../Components/Sent';
 
 const User = () => {
 
-
+  const [sendBox, setSendBox] = useState(false)
   const [compose, setCompose] = useState(false)
+  const toggleSendBox = ()=>{
+    setSendBox(pre=>!pre)
+  }
   
   const toggleCompose = ()=>{
     setCompose(pre=>!pre)
@@ -137,8 +141,10 @@ const User = () => {
   return (
     <div>
       <div style={{'fontSize': '2rem'}} className='m-2 p-2 px-5 font-monospace'>Welcome To Mail Box</div>
-      <div onClick={toggleCompose} className='text-center'> {compose? <Button variant='danger'>Close</Button> :<Button>Compose Mail</Button>} </div>
+      
+      <div className='text-center'><Button onClick={toggleSendBox} variant='success' className='mx-3'>Sent</Button> {compose? <Button onClick={toggleCompose} variant='danger'>Close</Button> :<Button onClick={toggleCompose}>Compose Mail</Button>} </div>
 
+    {sendBox && <Sent closeBox={toggleSendBox}/>}
     {compose && <Container className='col-lg-8 h-75 mx-auto my-3 bg-opacity-10 bg-black p-3'>
       <Row>
         <Col>
