@@ -140,9 +140,7 @@ const User = () => {
   }
 
 
-  setInterval(()=>{
-    getData()
-  },2000)
+
   return (
     <div>
       <div style={{'fontSize': '2rem'}} className='m-2 p-2 px-5 font-monospace'>Welcome To Mail Box</div>

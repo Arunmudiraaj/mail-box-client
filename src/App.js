@@ -7,7 +7,10 @@ import Login from './pages/Login';
 import User from './pages/User';
 import Mail from './Components/Mail';
 
+
 function App() {
+  
+
   return (
     <div className="App">
       <Navigation/>
@@ -15,7 +18,7 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/login' element={<Login/>}/>
-        <Route path='user' element={<User/>}/>
+        <Route path='/user' element={<User/>}/>
         <Route path='/:folder/:mailId' element={<Mail/>}/>
 
       </Routes>

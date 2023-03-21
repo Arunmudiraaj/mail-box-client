@@ -1,6 +1,17 @@
 import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 const Home = () => {
+  const navigate = useNavigate()
+  const email = useSelector(state=>state.authentication.email)
+  useEffect(()=>{
+    if (email){
+      navigate("/user")
+    }
+  },[])
+
   return (
     <Container fluid>
       <Row>
